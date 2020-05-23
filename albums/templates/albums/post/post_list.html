@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% load albums_tags %}
+{% load static %}
+{% load bootstrap_pagination %}
+
+{% block content %}
+
+<br />
+
+    <main role="main">
+
+      <section class="jumbotron text-center">
+        <div class="container">
+          <h1 class="jumbotron-heading">Album Photos</h1>
+          <p class="lead text-muted">
+              Browse among more then 1000 Photos available
+          </p>
+          <p>
+             <!-- Display all tags sended from view -->
+             {% if tags %}
+             <p>Tags: 
+             {% for tag in tags %}
+             <a href="{% url 'albums:post_list' tag.id %}" class="btn btn-outline-secondary btn-sm my-2">{{ tag.name }}</a>
+             {% endfor %}
+             </p>
+             {% endif %}
+          </p>
+        </div>
+      </section>
+
+    <div class="row row-cols-1 row-cols-md-3">
+        {% for post in post_list %}
+        <div class="col mb-4">
+            <div class="card h-100">
+                <a href="{% url 'albums:post_detail' post.id %}">
+                    {% if post.image.name %}
+                    <img src="{{ post.image.url }}" class="card-img-top" alt="image"> 
+                    {% else %}
+                    <img src="{% static 'img/no-image-available.png' %}" class="card-img-top" alt="image">
+                    {% endif %}
+                </a>
+                <div class="card-body bg-light">
+                    <h5 class="card-title">{{ post.title }}</h5>
+                    <p> Uploaded py 
+                    <a href="{% url 'albums:post_list' username=post.publisher.username %}">
+                        {{ post.publisher.username }}
+                    </a> 
+                    </p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+
+    <div>
+        {% if page_obj %}
+        {% include "albums/post/pagination.html" with page=page_obj %}
+        {% endif %}
+    </div>
+
+    <!-- custum tags that display most liked posts -->
+    <div> {% most_liked_posts %} </div>
+
+
+    </main>
+
+
+
+{% comment %}
+<div class="row row-cols-1 row-cols-md-3">
+    {% for post in post_list %}
+    <div class="col mb-4">
+        <div class="card h-100">
+            <a href="{% url 'albums:post_detail' post.id %}">
+                {% if post.image.name %}
+                <img src="{{ post.image.url }}" class="card-img-top" alt="image"> 
+                {% else %}
+                <img src="{% static 'img/no-image-available.png' %}" class="card-img-top" alt="image">
+                {% endif %}
+            </a>
+            <div class="card-body">
+                <h5 class="card-title">{{ post.title }}</h5>
+                <p> Uploaded py 
+                <a href="{% url 'albums:post_list' username=post.publisher.username %}">
+                    {{ post.publisher.username }}
+                </a> 
+                </p>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+
+<div>
+    {% if page_obj %}
+    {% include "albums/post/pagination.html" with page=page_obj %}
+    {% endif %}
+</div>
+
+<!-- custum tags that display most liked posts -->
+<div> {% most_liked_posts %} </div>
+{% endcomment %}
+
+{% endblock %}

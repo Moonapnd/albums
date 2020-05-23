@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+
+<h3>Update Post </h3>
+
+<form action="{% url 'albums:post_update' post.id %}" method="post" novalidate enctype="multipart/form-data" class="uniForm">
+    {{ form|crispy }}
+    {% csrf_token %}
+    <p><input type="submit" value="Update"></p>
+</form>
+
+
+
+{% endblock %}

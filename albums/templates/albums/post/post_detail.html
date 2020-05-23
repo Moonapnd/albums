@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% load albums_tags %}
+{% load static %}
+
+{% block content %}
+
+
+<div>
+
+    <!-- Display all tags of this Post -->
+    {% if post.tags.all %}
+    <p>Related Tags: 
+    {% for tag in post.tags.all %}
+    <a href="{% url 'albums:post_list' tag.id %}">{{ tag.name }}, </a>
+    {% endfor %}
+    </p>
+    {% endif %}
+
+    <!-- Display post.title and post.publisher.username -->
+    <p><b>Title: </b>{{ post.title }} by {{ post.publisher.username }}</p>
+
+    <!-- Display post.image.name and Image uploaded by user -->
+    <div>
+        {% if post.image.name %}
+        <img src="{{ post.image.url }}" class="card-img-top" alt="image"> 
+        {% else %}
+        <img src="{% static 'img/no-image-available.png' %}" class="card-img-top" alt="image">
+        {% endif %}
+    </div>
+
+
+    <!-- if the User is authenticated he could like post -->
+    {% if request.user.is_authenticated%}
+    <form action="{% url 'albums:like_post' %}" method='POST'>
+        {% csrf_token %}
+        <input type="hidden" name='post_id' value='{{post.id}}'>
+        {% if user not in post.liked.all %}
+        <button class='btn btn-primary' type='submit'>Like</button>
+        {% else %}
+        <button class='btn btn-danger' type='submit'>Unlike</button>
+        {% endif %}
+    </form>
+    <p>User is authenticated</p>
+    {% endif %}
+
+    <!-- if the User is authenticated and he own the post we allow him to Edit or Delete post-->
+    {% if is_post_owner %}
+    <div>
+        <p> <a href="{% url 'albums:post_update' post.id %}" class="btn btn-secondary"> Update </a> </p>
+        <p> <a href="{% url 'albums:post_delete' post.id %}" class="btn btn-danger"> Delete </a> </p>
+    </div>
+    {% endif %}
+
+
+</div>
+
+{% endblock %}

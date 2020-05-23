@@ -1,0 +1,95 @@
+
+Permission mixins for class-based views
+Django now ships with the mixins AccessMixin, LoginRequiredMixin, PermissionRequiredMixin,
+and UserPassesTestMixin to provide the functionality of the django.contrib.auth.decorators for
+class-based views. These mixins have been taken from, or are at least inspired by, the django-braces project.
+
+
+################## MyProducts ##################
+def get_queryset(self):
+    product_list = Product.objects.filter(author=self.request.user)
+    return product_list  
+############################################## 
+
+################## CreateProduct ################## 
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic.edit import CreateView
+from myapp.models import Product
+
+class CreateProduct(LoginRequiredMixin, CreateView):
+    model = Product
+    fields = ['title', 'image', ............ ]
+
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        return super().form_valid(form)
+############################################## 
+
+################## EditProduct ################## 
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic.edit import CreateView
+from myapp.models import Product
+
+class CreateProduct(LoginRequiredMixin, CreateView):
+    model = Product
+    fields = ['title', 'image', ............ ]
+
+    def form_valid(self, form):
+        if form.instance.author §= self.request.user:
+            return HttpResponse('You are not product owner')
+        return super().form_valid(form)
+############################################## 
+
+################## ProductDetail ################## 
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic.edit import DetailView
+from myapp.models import Product
+
+class ProductDetail(DetailView):
+    model = Product
+    template_name = 'product/detail.html'
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super().get_context_data(**kwargs)
+        # Add is_product_owner to context if user is authenticated and is product owner
+        # in 'product/detail.html' we should display 'edit' Button and 'Delete' Button if is_product_owner 
+        context['is_product_owner '] = True
+        return context
+
+############################################## 
+
+Page 383
+(use this mixin to allow only product owner to 'edit' or 'delete' product - )
+
+from django.contrib.auth.mixins import UserPassesTestMixin
+
+class MyView(UserPassesTestMixin, View):
+    def test_func(self):
+        return self.request.user.email.endswith('@example.com')
+
+
+---------------------------------------------------------------------------
+from django.contrib.auth.mixins import UserPassesTestMixin
+
+class EditProduct(UserPassesTestMixin, View):
+    # model = Product
+    # fields= .....
+
+    def test_func(self):
+        print(self)
+        # return self.request.user.email.endswith('@example.com')
+        return self.request.user.username = self.product.author.username 
+---------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
